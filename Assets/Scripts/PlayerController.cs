@@ -10,7 +10,8 @@ public class PlayerController : MonoBehaviour
     private float boostSpeed = 3;
     private float currentSpeed;
     public int pickUpCount; //currently public so we can see it since no UI exists
-    private float cannonBoosterThrustVertical = 500f;
+    private float cannonBoosterThrustVertical = 500;
+    private float cannonBoosterThrustHorizontal = 8;
     private float cannonBoosterRotation;
     public float target = 270f;
     public Quaternion originalRotationValue; //quaternion used to represent rotations
@@ -76,8 +77,6 @@ public class PlayerController : MonoBehaviour
             //get rotation of cannon boost pad
             cannonBoosterRotation = collision.transform.eulerAngles.y;
 
-            Debug.Log("cannonBoosterRotation: " + cannonBoosterRotation);
-
 
             //reset rotations of player1
             transform.rotation = Quaternion.identity;
@@ -85,7 +84,7 @@ public class PlayerController : MonoBehaviour
             transform.Rotate(0, cannonBoosterRotation, 0);
             
             //add forward force to object
-            rb.velocity = transform.forward*20;
+            rb.velocity = transform.forward* cannonBoosterThrustHorizontal;
 
             //add vertical force to object
             rb.AddForce(0, cannonBoosterThrustVertical, 0);
