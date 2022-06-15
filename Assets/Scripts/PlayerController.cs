@@ -63,11 +63,17 @@ public class PlayerController : MonoBehaviour
         //add force to player when they collide with cannon boost pad
         if (collision.gameObject.CompareTag("CannonBoostPad"))
         {
-            rb = GetComponent<Rigidbody>();
-            //add force to player
-            rb.AddForce(0, cannonBoosterThrustVertical, 0);
+            //find the angle of the jump pad
+            Vector3 cannonRotation = collision.transform.eulerAngles;
 
-            cannonBoosterRotation = transform.rotation.y;
+            //Transform t = collision.gameObject.transform.TransformDirection(;
+
+            //add force to player
+            //rb.AddForce(0, cannonBoosterThrustVertical, 0);
+
+            rb.AddForce(transform.TransformDirection(cannonRotation * 10));
+
+            cannonBoosterRotation = collision.transform.eulerAngles.y;
 
             Debug.Log("cannonBoosterRotation: " + cannonBoosterRotation);
 
