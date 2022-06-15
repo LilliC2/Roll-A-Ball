@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     public int pickUpCount; //currently public so we can see it since no UI exists
     private float cannonBoosterThrustVertical = 500f;
     private float cannonBoosterRotation;
+    public float target = 270f;
+    public Quaternion originalRotationValue; //quaternion used to represent rotations
 
     private bool winCondition = false;
 
@@ -21,6 +23,8 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>(); //assigns the rigid body to rb without needing to drag it
 
         currentSpeed = speed;
+
+        originalRotationValue = transform.rotation; //saves rotation
 
         //set pickup count to number of gameobjects in the game
         pickUpCount = GameObject.FindGameObjectsWithTag("Pick Up").Length; //FindGameObjectsWithTag returns an array, so must find length of array
@@ -66,19 +70,27 @@ public class PlayerController : MonoBehaviour
             //find the angle of the jump pad
             Vector3 cannonRotation = collision.transform.eulerAngles;
 
-            //Transform t = collision.gameObject.transform.TransformDirection(;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
 
-            //add force to player
-            //rb.AddForce(0, cannonBoosterThrustVertical, 0);
-
-            rb.AddForce(transform.TransformDirection(cannonRotation * 10));
-
+            //get rotation of cannon boost pad
             cannonBoosterRotation = collision.transform.eulerAngles.y;
 
             Debug.Log("cannonBoosterRotation: " + cannonBoosterRotation);
 
-            //find the rotation of the pad
-            //add force to the player at that rotation
+
+            //reset rotations of player1
+            transform.rotation = Quaternion.identity;
+            //rotate player in direction of cannon boost pad
+            transform.Rotate(0, cannonBoosterRotation, 0);
+            
+            //add forward force to object
+            rb.velocity = transform.forward*20;
+
+            //add vertical force to object
+            rb.AddForce(0, cannonBoosterThrustVertical, 0);
+            
+
         }
     }
 
@@ -122,6 +134,7 @@ public class PlayerController : MonoBehaviour
             winCondition = true;
             //set velocity of rb to 0
             rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
 
         }
 
