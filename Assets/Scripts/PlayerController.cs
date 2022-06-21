@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private float cannonBoosterRotation;
     public float target = 270f;
     public Quaternion originalRotationValue; //quaternion used to represent rotations
+    
 
     private bool winCondition = false;
 
@@ -121,6 +122,19 @@ public class PlayerController : MonoBehaviour
             Destroy(other.gameObject);
             
         }
+
+        if (other.gameObject.CompareTag("Finish")) 
+        {
+            //display win message to console 
+            Debug.Log("You Win!");
+            winCondition = true;
+            //set velocity of rb to 0
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            
+
+        }
+
     }
 
     void CheckPickUps()
