@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,12 +18,27 @@ public class PlayerController : MonoBehaviour
     private float cannonBoosterRotation;
     public float target = 270f;
     public Quaternion originalRotationValue; //quaternion used to represent rotations
-    
-
+    int totalPickUps;
     private bool winCondition = false;
+
+    [Header("UI")]
+    public GameObject inGamePanel;
+
+    public TMP_Text scoreText;
+    public TMP_Text winText;
+    public GameObject winPanel;
+    public Image pickUpFill;
+    float pickupChunk; //amount we will increment by on fill bar
 
     void Start()
     {
+        //locks mouse, can't see it on screen
+        Cursor.lockState = CursorLockMode.Locked;
+
+        //turn off win text object
+        winPanel.SetActive(false);
+        inGamePanel.SetActive(true);
+
         //gets rigidbody component attached to this game object
         rb = GetComponent<Rigidbody>(); //assigns the rigid body to rb without needing to drag it
 
@@ -30,6 +48,17 @@ public class PlayerController : MonoBehaviour
 
         //set pickup count to number of gameobjects in the game
         pickUpCount = GameObject.FindGameObjectsWithTag("Pick Up").Length; //FindGameObjectsWithTag returns an array, so must find length of array
+        //assign amount of pickups to total puickuips
+        totalPickUps = pickUpCount;
+
+        //work out the amount of fill for our pick up fill
+        pickupChunk = 1.0f / totalPickUps;
+
+        //ensure pickup fill starts at 0
+        pickUpFill.fillAmount = 0;
+
+        //display pickups
+        CheckPickUps();
     }
 
   
@@ -56,8 +85,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-
-    
     private void OnCollisionEnter(Collision collision)
     {
         //when player collides with boostpad their speed increases
@@ -103,8 +130,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-   
-
     private void OnTriggerEnter(Collider other)
     {
         //if we collide with a pickup, destory the pickup
@@ -114,8 +139,8 @@ public class PlayerController : MonoBehaviour
         {
             //everytime a pickup is destroyed decrease variable
             pickUpCount -= 1;
-            //display new pickup count to player
-            Debug.Log("Pick Up Count: " + pickUpCount);
+            //increase fill amount of our pick up fill image
+            pickUpFill.fillAmount = pickUpFill.fillAmount + pickupChunk;
 
             CheckPickUps(); 
             
@@ -125,11 +150,13 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag("Finish")) 
         {
-            //display win message to console 
-            Debug.Log("You Win!");
+            //can make module for winning but do that later
+
+            //display win message to player 
+            winPanel.SetActive(true);
             winCondition = true;
             //set velocity of rb to 0
-            rb.velocity = Vector3.zero;
+            //rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             
 
@@ -139,11 +166,20 @@ public class PlayerController : MonoBehaviour
 
     void CheckPickUps()
     {
+        //display pickupcount
+        scoreText.text = "Pick ups left: " + pickUpCount.ToString() + "/" + totalPickUps.ToString();
+
+        
+
         //check if the pickup count = 0
         if (pickUpCount == 0)
         {
-            //display win message to console 
-            Debug.Log("You Win!");
+            //unlocks mouse
+            Cursor.lockState = CursorLockMode.None;
+
+            //display win message to player
+            winPanel.SetActive(true);
+            inGamePanel.SetActive(false);
             winCondition = true;
             //set velocity of rb to 0
             rb.velocity = Vector3.zero;
@@ -153,6 +189,16 @@ public class PlayerController : MonoBehaviour
 
     }
   
+    // temp reset functionality
+    public void ResetGame() 
+    {
+        
 
+        //load the active scene again
+        UnityEngine.SceneManagement.SceneManager.LoadScene
+            (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
+    }
+        
 
 }
