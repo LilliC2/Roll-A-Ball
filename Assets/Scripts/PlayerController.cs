@@ -30,6 +30,11 @@ public class PlayerController : MonoBehaviour
     public Image pickUpFill;
     float pickupChunk; //amount we will increment by on fill bar
 
+    GameObject resetPoint;
+    bool resetting = false;
+    Color originalColour;
+    //ctor3 startPos;
+
     void Start()
     {
         //locks mouse, can't see it on screen
@@ -59,6 +64,12 @@ public class PlayerController : MonoBehaviour
 
         //display pickups
         CheckPickUps();
+
+        //setting up the respawn  point for out of bounds
+        resetPoint = GameObject.Find("RespawnPoint");
+        originalColour = GetComponent<Renderer>().material.color;
+        //ctor3 startPos = transform.position;
+
     }
 
   
@@ -82,6 +93,9 @@ public class PlayerController : MonoBehaviour
                                                                             in a 3D plane, x y z*/
         //adds force to our rigid body from our vector times our speed
         rb.AddForce(movement* currentSpeed);
+
+        if (resetting)
+            return;
 
     }
 
@@ -119,7 +133,15 @@ public class PlayerController : MonoBehaviour
             
 
         }
+
+        //to respawn player at start
+        if (collision.gameObject.CompareTag("Respawn"))
+        {
+            StartCoroutine(ResetPlayer()); //calls on function
+            
+        }
     }
+
 
     //when player exits collision with boostpad their speed returns to normal
     private void OnCollisionExit(Collision collision)
@@ -128,7 +150,11 @@ public class PlayerController : MonoBehaviour
         {
             currentSpeed = speed;
         }
+
+        
+
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -189,6 +215,29 @@ public class PlayerController : MonoBehaviour
 
     }
   
+    public IEnumerator ResetPlayer()
+    {
+        resetting = true;
+        GetComponent<Renderer>().material.color = Color.black;
+        rb.velocity = Vector3.zero;
+        Vector3 startPos = transform.position;
+        float resetSpeed = 2f;
+        var i = 0.0f;
+        var rate = 1.0f / resetSpeed;
+        while (i < 1.0f)
+        {
+            i += Time.deltaTime * rate;
+            transform.position = Vector3.Lerp(startPos, resetPoint.transform.position, i);
+            yield return null;
+
+        }
+
+        GetComponent<Renderer>().material.color = originalColour;
+        resetting = false;
+
+    }
+
+
     // temp reset functionality
     public void ResetGame() 
     {

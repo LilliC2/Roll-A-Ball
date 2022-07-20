@@ -7,6 +7,7 @@ TagManager:
   - Pick Up
   - BoostPad
   - CannonBoostPad
+  - ResetZone
   layers:
   - Default
   - TransparentFX
