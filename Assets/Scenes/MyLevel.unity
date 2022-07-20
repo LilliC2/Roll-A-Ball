@@ -736,7 +736,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 76456775}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -5936,7 +5936,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.9622642, g: 0.7551348, b: 0.503827, a: 1}
+  m_Color: {r: 0.7264151, g: 0.49036828, b: 0.19530971, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
