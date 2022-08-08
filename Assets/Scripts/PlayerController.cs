@@ -21,6 +21,10 @@ public class PlayerController : MonoBehaviour
     int totalPickUps;
     private bool winCondition = false;
 
+    public GameObject AxolotlPivot;
+
+    
+
     [Header("UI")]
     public GameObject inGamePanel;
 
@@ -29,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public GameObject winPanel;
     public Image pickUpFill;
     float pickupChunk; //amount we will increment by on fill bar
+    private Vector3 offset;
 
     GameObject resetPoint;
     bool resetting = false;
@@ -40,12 +45,16 @@ public class PlayerController : MonoBehaviour
         //locks mouse, can't see it on screen
         Cursor.lockState = CursorLockMode.Locked;
 
+        
+
         //turn off win text object
         winPanel.SetActive(false);
         inGamePanel.SetActive(true);
 
         //gets rigidbody component attached to this game object
         rb = GetComponent<Rigidbody>(); //assigns the rigid body to rb without needing to drag it
+
+        
 
         currentSpeed = speed;
 
@@ -65,6 +74,9 @@ public class PlayerController : MonoBehaviour
         //display pickups
         CheckPickUps();
 
+        //adds an offset for axolotl so he fits in the ball without clipping out
+        offset = AxolotlPivot.transform.position - transform.position;
+
         //setting up the respawn  point for out of bounds
         resetPoint = GameObject.Find("RespawnPoint");
         originalColour = GetComponent<Renderer>().material.color;
@@ -72,13 +84,20 @@ public class PlayerController : MonoBehaviour
 
     }
 
-  
+
+    
+
 
     /*fixed update; works different than update, based off actual time between things 
      * rather than frames between things*/
 
     void FixedUpdate()
     {
+
+        //moves axolotl to same position as player ball
+        AxolotlPivot.transform.position = transform.position + offset;
+
+
         if (winCondition == true)
             return; //function will loop until it reaches return
 
@@ -93,6 +112,8 @@ public class PlayerController : MonoBehaviour
                                                                             in a 3D plane, x y z*/
         //adds force to our rigid body from our vector times our speed
         rb.AddForce(movement* currentSpeed);
+
+        AxolotlPivot.transform.rotation = Quaternion.Euler(0, transform.rotation.y * moveHorizontal, 0);
 
         if (resetting)
             return;
