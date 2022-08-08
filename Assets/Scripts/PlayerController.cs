@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         //locks mouse, can't see it on screen
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
 
         
 
