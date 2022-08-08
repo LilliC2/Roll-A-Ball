@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private bool winCondition = false;
 
     public GameObject AxolotlPivot;
+    
 
     
 
@@ -113,7 +114,10 @@ public class PlayerController : MonoBehaviour
         //adds force to our rigid body from our vector times our speed
         rb.AddForce(movement* currentSpeed);
 
-        AxolotlPivot.transform.rotation = Quaternion.Euler(0, transform.rotation.y * moveHorizontal, 0);
+
+        Quaternion targetRotation = Quaternion.LookRotation(movement);
+        //AxolotlPivot.MoveRotation(targetRotation);
+
 
         if (resetting)
             return;
