@@ -41,6 +41,11 @@ public class PlayerController : MonoBehaviour
     Color originalColour;
     //ctor3 startPos;
 
+
+    //controllers
+    CameraController cameraController;
+
+
     void Start()
     {
         //locks mouse, can't see it on screen
@@ -55,7 +60,7 @@ public class PlayerController : MonoBehaviour
         //gets rigidbody component attached to this game object
         rb = GetComponent<Rigidbody>(); //assigns the rigid body to rb without needing to drag it
 
-        
+        cameraController = FindObjectOfType<CameraController>();
 
         currentSpeed = speed;
 
@@ -101,6 +106,11 @@ public class PlayerController : MonoBehaviour
 
         if (winCondition == true)
             return; //function will loop until it reaches return
+        
+        if (resetting)
+            return;
+
+        
 
         //store horizontal axis value in float
         float moveHorizontal = Input.GetAxis("Horizontal");
@@ -111,6 +121,16 @@ public class PlayerController : MonoBehaviour
         //create new vector3 based on horizontal and vertical values
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);/*vector 3 is a coordinate
                                                                             in a 3D plane, x y z*/
+
+        if (cameraController.cameraStyle == CameraStyle.Free)
+        {
+            //rotates the player to the direction of the camera
+            transform.eulerAngles = Camera.main.transform.eulerAngles;
+
+            //translates the input vectors into cooordinates
+            movement = transform.TransformDirection(movement);
+        }
+
         //adds force to our rigid body from our vector times our speed
         rb.AddForce(movement* currentSpeed);
 
@@ -119,8 +139,9 @@ public class PlayerController : MonoBehaviour
         //AxolotlPivot.MoveRotation(targetRotation);
 
 
-        if (resetting)
-            return;
+        
+
+        
 
     }
 
