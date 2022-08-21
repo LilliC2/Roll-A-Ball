@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 public enum CameraStyle { Fixed,Free}
 public class CameraController : MonoBehaviour
 {
     public GameObject player;
+
 
     public CameraStyle cameraStyle;
     public Transform pivot;
@@ -20,43 +23,52 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+
+        
+        
         //set the offset to the cameras positon - the players postion. stops camera from  being inside the player
         offset = transform.position - player.transform.position;
 
         //the offset of the pivot from the player
         pivotOffset = pivot.position - player.transform.position;
+
+
         
     }
 
     private void FixedUpdate()
     {
         //allows player to toggle between modes
-        if (Input.GetKey(KeyCode.C))
+        // && is and. || is or
+        if (Input.GetKey(KeyCode.C) && (SceneManager.GetActiveScene() != SceneManager.GetSceneByName("Plinko")))
         {
             cameraBool = !cameraBool;
         }
+
          
     }
 
+    
 
-    /*there are 3 versions of update
-     * Late Update; called after all the other update functions, generally used for cameras
-     * Fixed Update; runs indepednt of the frame rate, generally used for physics 
-     * Update; runs every frame
-     * */
-    void LateUpdate()
+
+/*there are 3 versions of update
+ * Late Update; called after all the other update functions, generally used for cameras
+ * Fixed Update; runs indepednt of the frame rate, generally used for physics 
+ * Update; runs every frame
+ * */
+void LateUpdate()
     {
         if (cameraBool == false)
         {
             cameraStyle = CameraStyle.Fixed;
-            Debug.Log("yay");
+            
         }
         else
         {
             cameraStyle = CameraStyle.Free;
-            Debug.Log("WOO");
+            
         }
-        Debug.Log("camreaBool = " + cameraBool);
+        
 
         //if we are using fixed camera mode
         if (cameraStyle == CameraStyle.Fixed)

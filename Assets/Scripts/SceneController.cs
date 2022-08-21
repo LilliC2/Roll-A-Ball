@@ -11,13 +11,16 @@ public class SceneController : MonoBehaviour
     [Header("UI")]
     public GameObject TitleScreenObj;
     public GameObject LevelSelectObj;
+    public GameObject MiniGameSelectObj;
+    public GameObject CameraModesText;
+
 
     private void Start()
     {
         TitleScreen();
-        
-    }
 
+
+    }
 
     public void ChangeScene(string _sceneName)
     {
@@ -47,6 +50,12 @@ public class SceneController : MonoBehaviour
         Application.Quit();
     }
 
+    public void MiniGameSelect()
+    {
+        TitleScreenObj.SetActive(false);
+        MiniGameSelectObj.SetActive(true);
+    }
+
     public void LevelSelect()
     {
         TitleScreenObj.SetActive(false);
@@ -57,8 +66,9 @@ public class SceneController : MonoBehaviour
     {
         TitleScreenObj.SetActive(true);
         LevelSelectObj.SetActive(false);
+        MiniGameSelectObj.SetActive(false);
 
     }
 
-
+    
 }

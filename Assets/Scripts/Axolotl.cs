@@ -9,14 +9,17 @@ public class Axolotl : MonoBehaviour
     public GameObject MainCamera;
     public float cameraXAngle ;
 
+    
+
     CameraController cameraController;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        
+       
     }
+
 
     // Update is called once per frame
     void FixedUpdate()

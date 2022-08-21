@@ -8,6 +8,7 @@ TagManager:
   - BoostPad
   - CannonBoostPad
   - ResetZone
+  - PlinkoStartZone
   layers:
   - Default
   - TransparentFX

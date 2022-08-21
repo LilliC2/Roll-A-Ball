@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 
 public class PlayerController : MonoBehaviour
@@ -20,11 +21,15 @@ public class PlayerController : MonoBehaviour
     public Quaternion originalRotationValue; //quaternion used to represent rotations
     int totalPickUps;
     private bool winCondition = false;
+    public Camera camera1;
+    public Camera camera2;
 
     public GameObject AxolotlPivot;
-    
 
-    
+    public bool pStartZone;
+
+
+
 
     [Header("UI")]
     public GameObject inGamePanel;
@@ -44,14 +49,14 @@ public class PlayerController : MonoBehaviour
 
     //controllers
     CameraController cameraController;
+    GameController gameController;
+    Timer timer;
 
 
     void Start()
     {
         //locks mouse, can't see it on screen
         //Cursor.lockState = CursorLockMode.Locked;
-
-        
 
         //turn off win text object
         winPanel.SetActive(false);
@@ -88,6 +93,20 @@ public class PlayerController : MonoBehaviour
         originalColour = GetComponent<Renderer>().material.color;
         //ctor3 startPos = transform.position;
 
+        pStartZone = true;
+
+        gameController = FindObjectOfType<GameController>();
+        timer = FindObjectOfType<Timer>();
+        //begins countdown if on speedrun mode
+        if (gameController.gameType == GameType.Speedrun)
+        {
+            StartCoroutine(timer.StartCountdown());
+            Debug.Log("entered");
+
+        }
+            
+
+
     }
 
 
@@ -109,11 +128,10 @@ public class PlayerController : MonoBehaviour
         
         if (resetting)
             return;
-
-        
+       
 
         //store horizontal axis value in float
-        float moveHorizontal = Input.GetAxis("Horizontal");
+            float moveHorizontal = Input.GetAxis("Horizontal");
         //store vertical axis value in float
         float moveVertical = Input.GetAxis("Vertical"); /*not to move up and down like a jump, to move 
                                                         forwards and backwards*/
@@ -138,7 +156,9 @@ public class PlayerController : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(movement);
         //AxolotlPivot.MoveRotation(targetRotation);
 
-
+        //&& is and
+        if (gameController.gameType == GameType.Speedrun && !timer.IsTiming())
+            return;
         
 
         
@@ -220,6 +240,17 @@ public class PlayerController : MonoBehaviour
             
         }
 
+        if (other.gameObject.CompareTag("PlinkoStartZone"))
+        {
+
+            pStartZone = true;
+            camera2.gameObject.SetActive(false);
+            camera1.gameObject.SetActive(true);
+
+
+        }
+        
+
         if (other.gameObject.CompareTag("Finish")) 
         {
             //can make module for winning but do that later
@@ -236,31 +267,51 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("PlinkoStartZone"))
+        {
+
+            pStartZone = false;
+            camera1.gameObject.SetActive(false);
+            camera2.gameObject.SetActive(true);
+
+
+        }
+    }
+
+
     void CheckPickUps()
     {
         //display pickupcount
         scoreText.text = "Pick ups left: " + pickUpCount.ToString() + "/" + totalPickUps.ToString();
 
-        
-
-        //check if the pickup count = 0
         if (pickUpCount == 0)
-        {
-            //unlocks mouse
-            Cursor.lockState = CursorLockMode.None;
+            WinGame();
 
-            //display win message to player
-            winPanel.SetActive(true);
-            inGamePanel.SetActive(false);
-            winCondition = true;
-            //set velocity of rb to 0
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
 
-        }
+
 
     }
   
+    void WinGame()
+    {
+        
+        //display win message to player
+        winPanel.SetActive(true);
+        inGamePanel.SetActive(false);
+        winCondition = true;
+        //set velocity of rb to 0
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        if (gameController.gameType == GameType.Speedrun)
+            timer.StopTimer();
+        
+
+
+    }
+
     public IEnumerator ResetPlayer()
     {
         resetting = true;
