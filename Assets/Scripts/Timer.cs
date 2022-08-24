@@ -54,7 +54,8 @@ public class Timer : MonoBehaviour
     public IEnumerator StartCountdown()
     {
         Debug.Log("Entered2");
-        bestTime = PlayerPrefs.GetFloat(bestTimeStr + sceneController.GetSceneName());
+        bestTime = 0; //PlayerPrefs.GetFloat(bestTimeStr + sceneController.GetSceneName());
+
         if (bestTime == 0f) bestTime = 600f;
 
         countdownPanel.SetActive(true);
