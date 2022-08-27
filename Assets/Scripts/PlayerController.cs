@@ -23,10 +23,13 @@ public class PlayerController : MonoBehaviour
     private bool winCondition = false;
     public Camera camera1;
     public Camera camera2;
+    public bool grounded = true;
 
     public GameObject AxolotlPivot;
 
     public bool pStartZone;
+
+    public bool canControl = true;
 
 
 
@@ -51,9 +54,11 @@ public class PlayerController : MonoBehaviour
     CameraController cameraController;
     GameController gameController;
     Timer timer;
+    SoundController soundController;
 
 
-    void Start()
+
+    private void Start()
     {
         //locks mouse, can't see it on screen
         //Cursor.lockState = CursorLockMode.Locked;
@@ -95,13 +100,22 @@ public class PlayerController : MonoBehaviour
 
         pStartZone = true;
 
+
+        //Controllers
         gameController = FindObjectOfType<GameController>();
+        soundController = FindObjectOfType<SoundController>();
         timer = FindObjectOfType<Timer>();
         //begins countdown if on speedrun mode
         if (gameController.gameType == GameType.Speedrun)
         {
+            
+            StartCoroutine(PausePlayer());
+            
             StartCoroutine(timer.StartCountdown());
-            Debug.Log("entered");
+            
+            
+
+
 
         }
             
@@ -110,7 +124,12 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    
+    public IEnumerator PausePlayer()
+    {
+        canControl = false;
+        yield return new WaitForSeconds(3f);
+        canControl = true;
+    }
 
 
     /*fixed update; works different than update, based off actual time between things 
@@ -118,47 +137,64 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-
+        
         //moves axolotl to same position as player ball
         AxolotlPivot.transform.position = transform.position + offset;
 
+        
 
         if (winCondition == true)
             return; //function will loop until it reaches return
         
         if (resetting)
             return;
-       
 
-        //store horizontal axis value in float
-            float moveHorizontal = Input.GetAxis("Horizontal");
-        //store vertical axis value in float
-        float moveVertical = Input.GetAxis("Vertical"); /*not to move up and down like a jump, to move 
+        if (gameController.controlType == ControlType.WorldTilt)
+            return;
+
+        if (canControl == true)
+        {
+            if (grounded)
+            {
+                //store horizontal axis value in float
+                float moveHorizontal = Input.GetAxis("Horizontal");
+                //store vertical axis value in float
+                float moveVertical = Input.GetAxis("Vertical"); /*not to move up and down like a jump, to move 
                                                         forwards and backwards*/
 
-        //create new vector3 based on horizontal and vertical values
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);/*vector 3 is a coordinate
+                //create new vector3 based on horizontal and vertical values
+                Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);/*vector 3 is a coordinate
                                                                             in a 3D plane, x y z*/
 
-        if (cameraController.cameraStyle == CameraStyle.Free)
-        {
-            //rotates the player to the direction of the camera
-            transform.eulerAngles = Camera.main.transform.eulerAngles;
+                if (cameraController.cameraStyle == CameraStyle.Free)
+                {
+                    //rotates the player to the direction of the camera
+                    transform.eulerAngles = Camera.main.transform.eulerAngles;
 
-            //translates the input vectors into cooordinates
-            movement = transform.TransformDirection(movement);
+                    //translates the input vectors into cooordinates
+                    movement = transform.TransformDirection(movement);
+                }
+
+                //adds force to our rigid body from our vector times our speed
+                rb.AddForce(movement * currentSpeed);
+
+
+                Quaternion targetRotation = Quaternion.LookRotation(movement);
+                //AxolotlPivot.MoveRotation(targetRotation);
+
+            }
         }
+        
+           
+        
 
-        //adds force to our rigid body from our vector times our speed
-        rb.AddForce(movement* currentSpeed);
 
-
-        Quaternion targetRotation = Quaternion.LookRotation(movement);
-        //AxolotlPivot.MoveRotation(targetRotation);
 
         //&& is and
         if (gameController.gameType == GameType.Speedrun && !timer.IsTiming())
             return;
+
+        
         
 
         
@@ -176,6 +212,9 @@ public class PlayerController : MonoBehaviour
         //add force to player when they collide with cannon boost pad
         if (collision.gameObject.CompareTag("CannonBoostPad"))
         {
+            soundController.PlayJumpPadSound();
+            
+
             //find the angle of the jump pad
             Vector3 cannonRotation = collision.transform.eulerAngles;
 
@@ -208,6 +247,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.collider.CompareTag("Ground"))
+            grounded = true;
+
+        if(collision.gameObject.CompareTag("Wall"))
+        {
+            soundController.PlayCollisionSound(collision.gameObject);
+        }
+    }
 
     //when player exits collision with boostpad their speed returns to normal
     private void OnCollisionExit(Collision collision)
@@ -215,9 +264,11 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("BoostPad"))
         {
             currentSpeed = speed;
+            soundController.PlayBoostPadSound();
         }
-
         
+        if (collision.collider.CompareTag("Ground"))
+            grounded = false;
 
     }
 
@@ -233,11 +284,11 @@ public class PlayerController : MonoBehaviour
             pickUpCount -= 1;
             //increase fill amount of our pick up fill image
             pickUpFill.fillAmount = pickUpFill.fillAmount + pickupChunk;
-
-            CheckPickUps(); 
-            
+            soundController.PlayPickupSound();
+            CheckPickUps();
             Destroy(other.gameObject);
-            
+
+
         }
 
         if (other.gameObject.CompareTag("PlinkoStartZone"))
@@ -296,7 +347,8 @@ public class PlayerController : MonoBehaviour
   
     void WinGame()
     {
-        
+
+        soundController.PlayWinSound();
         //display win message to player
         winPanel.SetActive(true);
         inGamePanel.SetActive(false);

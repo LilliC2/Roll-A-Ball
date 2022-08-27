@@ -5,11 +5,11 @@ using UnityEngine;
 public class Rotator : MonoBehaviour
 {
 
-    float bobbingSpeed = 5f;
+    float bobbingSpeed = 2f;
     float height = 0.2f;
     Vector3 pos;
 
-    float rotateSpeed = 5f;
+    float rotateSpeed = 2f;
 
     
 
@@ -21,7 +21,7 @@ public class Rotator : MonoBehaviour
     void Update()
     {
         //rotate our object around an axis over time
-        transform.Rotate(new Vector3(45,12,30) * Time.deltaTime * rotateSpeed);
+        transform.Rotate(new Vector3(0,12,0) * Time.deltaTime * rotateSpeed);
 
         //calculate what the new Y position will be
         float newY = Mathf.Sin(Time.time * bobbingSpeed) * height + pos.y;

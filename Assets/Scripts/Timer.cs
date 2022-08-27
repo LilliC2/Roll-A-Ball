@@ -6,12 +6,18 @@ using TMPro;
 
 public class Timer : MonoBehaviour
 {
-    private string bestTimeStr = "Best Time";
+    //private string bestTimeStr = "Best Time";
     float currentTime = 0;
     float bestTime;
+    
     bool timing = false;
 
+    public GameObject player;
+
     SceneController sceneController;
+    SoundController soundController;
+
+
 
 
     [Header("UI Countdown Panel")]
@@ -30,10 +36,10 @@ public class Timer : MonoBehaviour
     void Start()
     {
         timesePanell.SetActive(false);
-        countdownPanel.SetActive(false);
+        //countdownPanel.SetActive(false);
         timerText.text = "";
         sceneController = FindObjectOfType<SceneController>();
-        
+        bestTime = PlayerPrefs.GetFloat("BestTime" + sceneController.GetSceneName());
        
 
 
@@ -53,12 +59,16 @@ public class Timer : MonoBehaviour
 
     public IEnumerator StartCountdown()
     {
-        Debug.Log("Entered2");
-        bestTime = 0; //PlayerPrefs.GetFloat(bestTimeStr + sceneController.GetSceneName());
+        
+        //bestTime = PlayerPrefs.GetFloat(bestTimeStr + sceneController.GetSceneName());
 
-        if (bestTime == 0f) bestTime = 600f;
+        if (bestTime == 0f)bestTime = 600f;
+        
 
         countdownPanel.SetActive(true);
+
+        
+
         countdownText.text = "3";
         yield return new WaitForSeconds(1);
         countdownText.text = "2";

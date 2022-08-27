@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum GameType { Normal, Speedrun}
+public enum ControlType { Normal, WorldTilt}
 
 public class GameController : MonoBehaviour
 {
-
+    //speedrun
     public static GameController instance;
     public GameType gameType;
+
+    //world tilt
+    public ControlType controlType;
 
     private void Awake()
     {
@@ -29,6 +33,15 @@ public class GameController : MonoBehaviour
     {
         gameType = _gameType;
 
+    }
+
+    public void ToggleWorldTilt(bool _tilt)
+    {
+        if (_tilt)
+            controlType = ControlType.WorldTilt;
+        else
+            controlType = ControlType.Normal;
+            
     }
 
     public void ToggleSpeedRun(bool _speedRun)

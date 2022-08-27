@@ -8,18 +8,12 @@ public class SceneController : MonoBehaviour
 
 {
     //will change scene to the string pass in
-    [Header("UI")]
-    public GameObject TitleScreenObj;
-    public GameObject LevelSelectObj;
-    public GameObject MiniGameSelectObj;
-    public GameObject CameraModesText;
+    
 
 
     private void Start()
     {
-        TitleScreen();
-
-
+        
     }
 
     public void ChangeScene(string _sceneName)
@@ -36,6 +30,7 @@ public class SceneController : MonoBehaviour
     //loads out title scene. must be called Title exactly
     public void ToTitleScene()
     {
+        GameController.instance.controlType = ControlType.Normal;
         SceneManager.LoadScene("Title");
     }
     
@@ -50,25 +45,7 @@ public class SceneController : MonoBehaviour
         Application.Quit();
     }
 
-    public void MiniGameSelect()
-    {
-        TitleScreenObj.SetActive(false);
-        MiniGameSelectObj.SetActive(true);
-    }
-
-    public void LevelSelect()
-    {
-        TitleScreenObj.SetActive(false);
-        LevelSelectObj.SetActive(true);
-    }
-
-    public void TitleScreen()
-    {
-        TitleScreenObj.SetActive(true);
-        LevelSelectObj.SetActive(false);
-        MiniGameSelectObj.SetActive(false);
-
-    }
+    
 
     
 }
